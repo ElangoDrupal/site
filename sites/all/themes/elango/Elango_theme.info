@@ -1,0 +1,29 @@
+name = Elango_theme_1
+description = Custom theme for my site
+core = 7.x
+engine = phptemplate
+
+regions[header] = Header
+regions[sidebar_first] =Left sidebar
+regions[sidebar_second] =Right sidebars
+regions[header_top] = Header top
+regions[content] = Content
+regions[footer] = Footer
+regions[main_menu] = main menu
+regions[secondary_menu] = secondary menu
+regions[slideshow] = slideshow
+
+regions[footer_firstcolumn] = Footer first column
+regions[footer_secondcolumn] = Footer second column
+regions[footer_thirdcolumn] = Footer third column
+regions[footer_fourthcolumn] = Footer fourth column
+regions[footer] = Footer
+
+
+
+stylesheets[all][] = css/style.css
+
+feature[] =main_menu
+feature[] =secondary_menu
+
+

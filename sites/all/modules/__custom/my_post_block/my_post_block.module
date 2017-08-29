@@ -1,0 +1,20 @@
+<?php
+ function my_post_block_block_info(){
+
+ 	$blocks= array();
+ 	$blocks['my_post_block']['info']= t('my_post_block');
+ 	return $blocks;
+ }
+ function my_post_block_block_view($delta = ''){
+  $block =array();
+  switch ($delta) {
+  	case 'my_post_block':
+  		# code..
+  	    $block['subject']='my_post_for_block';
+  	    $block['content']='Welcome to my page content';
+  		break;
+  }
+
+return $block;
+
+ }

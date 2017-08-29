@@ -1,0 +1,5 @@
+name = My Post
+description = Custom module for my theme
+core = 7.x 
+package= Elango's custom module
+version = "7.x-2.0.1"

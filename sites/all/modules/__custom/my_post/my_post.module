@@ -1,0 +1,36 @@
+<?php
+
+  function my_post_menu() {
+    $items = array();
+    $items['my_post']=array(
+      'title'=> t('My personal post'),
+      'page callback' => 'my_post_list',
+      'access arguments' => array('access content'),
+    );
+        return $items;
+  }
+function my_post_list()
+{ 
+  $output = "hello world";
+  
+//  $query->entityCondition('entity_type', 'node')
+//        ->entityCondition('bundle', 'article')
+//        ->propertyCondition('status', NODE_PUBLISHED)
+//        ->propertyOrderBy('created', 'DESC')
+//        ->range(0, 10);
+//          $result = $query->execute();
+//  if(isset($result['node'])) {
+//      $custom_items_nids = array_keys($result['node']);
+//      $custom_items = entity_load('node',$custom_items_nids);
+//  } 
+//  $output = "<ul>\n";
+//  foreach($custom_items as $custom_item){
+//   $snippet = "<li>\n";
+//   $snippet .= "<h2>".t($custom_item->title)."</h2>\n";
+//   $snippet .= "<p>".t(substr($custom_item->body['und'][0]['value'],0, 600))."</p>\n";
+//   $snippet .= "<li>\n";
+//   $output .= $snippet;
+// }   
+//   $output .= "<ul>\n";
+echo  $output;
+}

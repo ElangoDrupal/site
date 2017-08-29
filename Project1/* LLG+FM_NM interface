@@ -1,0 +1,156 @@
+* LLG+FM_NM interface
+* gshe with inplane or pma, simply set hp for inplane
+
+.include 'main_gshe.sp'
+.option post
+.tran 0.5n 23n 0.001p 0.5n UIC
+.probe i(*)
+.ic V(thetat)='0.01'
+.ic V(phit)='0'
+.ic V(thetab)='0.01'
+.ic V(phib)='0'
+
+
+*      			this simualtion is after the error find out in the 19ns over laping
+*          we moved the value by 1ns   but the value is still getting wrosen    to.     18mV.   19.9 MV
+*           thi smake the simulation to be more wrosen when compared to previous       17.5     20.7
+*            this is problem is due to overlapping of top/bottom read current 15-16ns overlap with rowl1 activation
+
+
+*.     this simulation after 1 and 2 cell with correct value
+*
+*.
+*
+
+.include '130nm_bulk.txt'
+.param vdd_val = 1.2
+vSupply vdd 0 'vdd_val'
+
+
+vSupplyrow vrow 0 2.0V
+vSupply_logic vdd_logic 0 1.5V
+
+vSupply2 vwrite 0 0.4V
+
+vGround vss 0 0v
+
+.global vss
+.global vdd
+
+.param tech_len=130n
+.param wnmos=0.26u
+.param wpmos=0.65u
+
+.param wnmos_write=0.18u
+
+XDSHMRAM_1  top   bottom 1c_1 2c_1 thetat phit thetab phib main_gshe G0='1e-3' PF='0.0' g='2' a='1' b='0' P='0.5' theta='-0.12' L='80*1e-9' W='170*1e-9'
+
+
+***********************************************     read operation
+**********************************************************************************************************************************************************************
+* 	                Drain.      Gate         Source         Substrate   Type          Width.      Length
+Mp0 	          om 	      ombar      vdd_logic          vdd        pmos       W=wpmos   L=tech_len
+Mp1 	          ombar 	  om         vdd_logic          vdd        pmos       W=wpmos   L=tech_len
+Mp2 	          om 	      sen        vdd_logic          vdd        pmos       W=wpmos   L=tech_len
+Mp3 	          ombar       sen        vdd_logic          vdd        pmos       W=wpmos   L=tech_len
+Mn0          	  ombar 	 om          top                vss        nmos       W=wnmos   L=tech_len
+Mn1          	  om 	     ombar       bottom             vss        nmos       W=wnmos   L=tech_len
+Mn2          	  1c_1 	     sen         gnd                vss        nmos       W=wnmos   L=tech_len
+
+*Vsen  sen   0  pulse( 0V 1V    0ns 0ns  0ns  1.5ns  3ns  )
+*Vsen sen 0 PWL (0 0V 20.89n   0V  20.9n   1.5V    21.49n  1.5V    21.5n 0V   49.99n 0V  50n 1.5V    51.49n 1.5V     51.5n 0V )
+
+Vsen sen 0 PWL(0 0V  1ns 0V     9.99ns 0V 10.00ns 0.7V 10.59ns 0.7V 10.60ns 0uA      12.59ns 0mA 12.60ns 0.7V 13.19ns 0.7V 13.20ns 0uA  15.29ns 0mA 15.30ns 0.7V 15.89ns 0.7V 15.90ns 0uA   17.89ns 0mA 17.90ns 0.7V 18.49ns 0.7V 18.50ns 0uA       20.49ns 0mA 20.50ns 0.7V 21.09ns 0.7V 21.10ns 0uA)
+********************************************************************************************************************************************************************************************************************************************************************************************************************************************
+***********************************************     write operation
+**********************************************************************************************************************************************************************
+*************************these are interconeection transistor. ******************************************************
+Mrow1l_1                2c_1 	 rowl_1 	               temp_1    vss        nmos        wnmos_write            L=tech_len
+Mrow2l_1                2c_1 	 rowl_1 	               temp_1    vss        nmos        wnmos_write            L=tech_len
+******************left side  is common to both cell  so i think we no need to change the this two side transistor
+Mrowbottom_left_1r_!   1c_1 	 rowbottom_left_1 	       vss       vss        nmos        wnmos_write       L=tech_len
+Mrowbottom_left_2r_!   1c_1 	 rowbottom_left_1	       vss       vss        nmos        wnmos_write       L=tech_len
+Mrowtop_left_1r_1      1c_1 	 rowtop_left_1  	       vrow      vrow       pmos        W=wpmos  	      L=tech_len
+Mrowtop_left_2r_1      1c_1 	 rowtop_left_1	           vrow      vrow       pmos        W=wpmos  	      L=tech_len
+*********************************************************************************************************************************************
+**********************************right side 1st side write circuit
+Mrowbottom_right_1r_1cell_1            temp_1 	 rowbottom_right_1cell_1 	          vss     vss        nmos        wnmos_write            L=tech_len
+Mrowbottom_right_2r_1cell_1            temp_1 	 rowbottom_right_1cell_1	          vss     vss        nmos        wnmos_write            L=tech_len
+
+Mrowtop_right_1r_1cell_1            temp_1 	 rowtop_right_1cell_1  	                  vrow    vrow        pmos        W=wpmos  	      L=tech_len
+Mrowtop_right_2r_1cell_1            temp_1 	 rowtop_right_1cell_1	                  vrow    vrow        pmos        W=wpmos  	      L=tech_len
+
+*********************************************************************************************************************************************
+*********************************************************************************************************************************************
+*******************************************************************************************************************************************************************************
+Vrowtop_left_1         rowtop_left_1  0 PWL (0 1V 3ns 1V 8.1ns 1V 8.2ns 0V 9.2ns 0V 9.3ns 1V     10.7n 1V 10.8n 1V 11.8ns 1V 11.9ns 1V       13.4n 1V 13.5n 1V 14.5ns 1V 14.6ns 1V     16.0n 1V 16.1n 1V 17.1ns 1V 17.2ns 1V       18.6n 1V 18.7n 1V 19.7ns 1V 19.8ns 1V)
+
+Vrowbottom_left_1   rowbottom_left_1   0 PWL (0 1V 3ns 1V 8.1ns 1V 8.2ns 0V 9.2ns 0V 9.3ns 1V     10.7n 1V 10.8n 1V 11.8ns 1V 11.9ns 1V        13.4n 1V 13.5n 1V 14.5ns 1V 14.6ns 1V     16.0n 1V 16.1n 1V 17.1ns 1V 17.2ns 1V       18.6n 1V 18.7n 1V 19.7ns 1V 19.8ns 1V)
+*******************************************************************************************************************************************************************************
+
+*********************************************************************.       cell 1.    *******************************************************
+Vrowtop_right_1cell_1 rowtop_right_1cell_1       0 PWL (0 1V 3ns 1V 8.1ns 1V 8.2ns 1V 9.2ns 1V 9.3ns 1V     10.7n 1V 10.8n 1V 11.8ns 1V 11.9ns 1V       13.4n 1V 13.5n 1V 14.5ns 1V 14.6ns 1V     16.0n 1V 16.1n 1V 17.1ns 1V 17.2ns 1V       18.6n 1V 18.7n 0V 19.7ns 0V 19.8ns 1V)
+
+Vrowbottom_right_1cell_1 rowbottom_right_1cell_1 0 PWL (0 1V 3ns 1V 8.1ns 1V 8.2ns 1V 9.2ns 1V 9.3ns 1V     10.7n 1V 10.8n 1V 11.8ns 1V 11.9ns 1V       13.4n 1V 13.5n 1V 14.5ns 1V 14.6ns 1V     16.0n 1V 16.1n 1V 17.1ns 1V 17.2ns 1V       18.6n 1V 18.7n 0V 19.7ns 0V 19.8ns 1V)
+
+Vrowl_1cell_1     rowl_1    0 PWL (0 0V 3ns 0V 8.1ns 0V 8.2ns 1V 9.2ns 1V 9.3ns 0V     10.7n 0V 10.8n 1V 11.8ns 1V 11.9ns 0V       13.4n 0V 13.5n 1V 14.5ns 1V 14.6ns 0V     16.0n 0V 16.1n 1V 17.1ns 1V 17.2ns 0V       18.6n 0V 18.7n 1V 19.7ns 1V 19.8ns 0V)
+
+*********************************************************************.       cell 2.    *******************************************************
+.alter
+.tran 0.5n 23n 0.001p 0.5n UIC
+.option post
+.probe i(*)
+
+Vrowtop_right_1cell_1 rowtop_right_1cell_1       0 PWL (0 1V 3ns 1V 8.1ns 1V 8.2ns 1V 9.2ns 1V 9.3ns 1V     10.7n 1V 10.8n 1V 11.8ns 1V 11.9ns 1V       13.4n 1V 13.5n 1V 14.5ns 1V 14.6ns 1V     16.0n 1V 16.1n 0V 17.1ns 0V 17.2ns 1V       18.6n 1V 18.7n 0V 19.7ns 0V 19.8ns 1V)
+
+Vrowbottom_right_1cell_1 rowbottom_right_1cell_1 0 PWL (0 1V 3ns 1V 8.1ns 1V 8.2ns 1V 9.2ns 1V 9.3ns 1V     10.7n 1V 10.8n 1V 11.8ns 1V 11.9ns 1V       13.4n 1V 13.5n 1V 14.5ns 1V 14.6ns 1V     16.0n 1V 16.1n 0V 17.1ns 0V 17.2ns 1V       18.6n 1V 18.7n 0V 19.7ns 0V 19.8ns 1V)
+
+
+Vrowl_1cell_1     rowl_1    0 PWL (0 1V 3ns 0V 8.1ns 0V 8.2ns 1V 9.2ns 1V 9.3ns 0V     10.7n 0V 10.8n 1V 11.8ns 1V 11.9ns 0V        13.4n 0V 13.5n 1V 14.5ns 1V 14.6ns 0V     16.0n 0V 16.1n 1V 17.1ns 1V 17.2ns 0V       18.6n 0V 18.7n 1V 19.7ns 1V 19.8ns 0V)
+
+*Initial angle of the free layer (close to +z axis)
+.ic V(thetat)='0.01'
+.ic V(phit)='0'
+.ic V(thetab)='0.01'
+.ic V(phib)='0'
+
+*********************************************************************.       cell 3.    *******************************************************
+.alter
+.tran 0.5n 23n 0.001p 0.5n UIC
+.option post
+.probe i(*)
+
+
+Vrowtop_right_1cell_1 rowtop_right_1cell_1        0 PWL (0 1V 3ns 1V 8.1ns 1V 8.2ns 1V 9.2ns 1V 9.3ns 1V     10.7n 1V 10.8n 1V 11.8ns 1V 11.9ns 1V        13.4n 1V 13.5n 0V 14.5ns 0V 14.6ns 1V     16.0n 1V 16.1n 0V 17.1ns 0V 17.2ns 1V       18.6n 1V 18.7n 0V 19.7ns 0V 19.8ns 1V)
+
+
+Vrowbottom_right_1cell_1 rowbottom_right_1cell_1  0 PWL (0 1V 3ns 1V 8.1ns 1V 8.2ns 1V 9.2ns 1V 9.3ns 1V     10.7n 1V 10.8n 1V 11.8ns 1V 11.9ns 1V        13.4n 1V 13.5n 0V 14.5ns 0V 14.6ns 1V     16.0n 1V 16.1n 0V 17.1ns 0V 17.2ns 1V       18.6n 1V 18.7n 0V 19.7ns 0V 19.8ns 1V)
+
+
+Vrowl_1cell_1     rowl_1    0 PWL (0 0V 3ns 0V 8.1ns 0V 8.2ns 1V 9.2ns 1V 9.3ns 0V     10.7n 0V 10.8n 1V 11.8ns 1V 11.9ns 0V        13.4n 0V 13.5n 1V 14.5ns 1V 14.6ns 0V     16.0n 0V 16.1n 1V 17.1ns 1V 17.2ns 0V       18.6n 0V 18.7n 1V 19.7ns 1V 19.8ns 0V)
+
+*Initial angle of the free layer (close to +z axis)
+.ic V(thetat)='0.01'
+.ic V(phit)='0'
+.ic V(thetab)='0.01'
+.ic V(phib)='0'
+
+*********************************************************************.       cell 4.    *******************************************************
+.alter
+.tran 0.5n 23n 0.001p 0.5n UIC
+.option post
+.probe i(*)
+
+Vrowtop_right_1cell_1 rowtop_right_1cell_1        0 PWL (0 1V 3ns 1V 8.1ns 1V 8.2ns 1V 9.2ns 1V 9.3ns 1V     10.7n 1V 10.8n 0V 11.8ns 0V 11.9ns 1V        13.4n 1V 13.5n 0V 14.5ns 0V 14.6ns 1V     16.0n 1V 16.1n 0V 17.1ns 0V 17.2ns 1V       18.6n 1V 18.7n 0V 19.7ns 0V 19.8ns 1V)
+
+Vrowbottom_right_1cell_1 rowbottom_right_1cell_1  0 PWL (0 1V 3ns 1V 8.1ns 1V 8.2ns 1V 9.2ns 1V 9.3ns 1V     10.7n 1V 10.8n 0V 11.8ns 0V 11.9ns 1V        13.4n 1V 13.5n 0V 14.5ns 0V 14.6ns 1V     16.0n 1V 16.1n 0V 17.1ns 0V 17.2ns 1V       18.6n 1V 18.7n 0V 19.7ns 0V 19.8ns 1V)
+
+Vrowl_1cell_1     rowl_1    0 PWL (0 0V 3ns 0V 8.1ns 0V 8.2ns 1V 9.2ns 1V 9.3ns 0V     10.7n 0V 10.8n 1V 11.8ns 1V 11.9ns 0V        13.4n 0V 13.5n 1V 14.5ns 1V 14.6ns 0V     16.0n 0V 16.1n 1V 17.1ns 1V 17.2ns 0V       18.6n 0V 18.7n 1V 19.7ns 1V 19.8ns 0V)
+
+*Initial angle of the free layer (close to +z axis)
+.ic V(thetat)='0.01'
+.ic V(phit)='0'
+.ic V(thetab)='0.01'
+.ic V(phib)='0'
+
+.end

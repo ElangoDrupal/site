@@ -1,0 +1,11 @@
+name = RESTfull module
+description= Restful API first try by Elango Dhanasekaran.
+core=7.x
+
+package= Elango's custom module for RESTapi
+
+dependencies[] = restful
+
+
+registry_autoload[] = PSR-4
+

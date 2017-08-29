@@ -1,0 +1,7 @@
+name = Custom
+description = This is a sample Custom Module 
+core = 7.x
+package = Navi’s Custom Module
+version = “7.x-2.0.1”
+
+

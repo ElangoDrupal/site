@@ -1,0 +1,5 @@
+name = My Post Block
+description = Custom module for my theme output as block
+core = 8.x 
+package= Elango's custom module
+version = "7.x-2.0.1"
